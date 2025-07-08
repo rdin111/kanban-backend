@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Compile to a modern version of JavaScript
+    "module": "CommonJS", // Use the standard Node.js module system
+    "rootDir": "./src", // Where our TypeScript source code lives
+    "outDir": "./dist", // Where the compiled JavaScript will go
+    "esModuleInterop": true, // Allows for cleaner imports
+    "forceConsistentCasingInFileNames": true,
+    "strict": true, // Enforces strict type-checking
+    "skipLibCheck": true
+  }
+}
