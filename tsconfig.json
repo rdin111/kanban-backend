@@ -8,5 +8,6 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true, // Enforces strict type-checking
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["node_modules", "dist", "tests"]
 }
