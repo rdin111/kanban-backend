@@ -4,19 +4,27 @@ import { Server, Socket } from 'socket.io';
 let io: Server;
 
 export const initSocket = (httpServer: HttpServer) => {
+    const allowedOrigins = [
+        'http://localhost:5173', // Your local frontend
+        'https://www.flowboard.me', // Your deployed frontend
+        'https://flowboard.me' // Optional: without www
+    ];
+
+    if (process.env.FRONTEND_URL && !allowedOrigins.includes(process.env.FRONTEND_URL)) {
+        allowedOrigins.push(process.env.FRONTEND_URL);
+    }
+
     io = new Server(httpServer, {
         cors: {
-            origin: 'http://localhost:5173', // The origin of our future React app
+            origin: allowedOrigins,
             methods: ['GET', 'POST'],
-            credentials: true // Allow cookies for authenticated socket connections
-
+            credentials: true
         },
     });
 
     io.on('connection', (socket: Socket) => {
         console.log('🔌 A user connected:', socket.id);
 
-        // Handler for a user joining a board-specific room
         socket.on('joinBoard', (boardId: string) => {
             socket.join(boardId);
             console.log(`User ${socket.id} joined board ${boardId}`);
@@ -30,7 +38,6 @@ export const initSocket = (httpServer: HttpServer) => {
     return io;
 };
 
-// Export a function to get the io instance so our services can use it
 export const getIo = (): Server => {
     if (!io) {
         throw new Error('Socket.io not initialized!');
