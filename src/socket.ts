@@ -5,18 +5,20 @@ let io: Server;
 
 export const initSocket = (httpServer: HttpServer) => {
     const allowedOrigins = [
-        'http://localhost:5173', // Your local frontend
-        'https://www.flowboard.me', // Your deployed frontend
-        'https://flowboard.me' // Optional: without www
+        'http://localhost:5173',
+        'https://www.flowboard.me',
+        'https://flowboard.me'
     ];
-
-    if (process.env.FRONTEND_URL && !allowedOrigins.includes(process.env.FRONTEND_URL)) {
-        allowedOrigins.push(process.env.FRONTEND_URL);
-    }
 
     io = new Server(httpServer, {
         cors: {
-            origin: allowedOrigins,
+            origin: function (origin, callback) {
+                if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
             methods: ['GET', 'POST'],
             credentials: true
         },
