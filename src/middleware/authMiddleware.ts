@@ -1,10 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-    // req.user is created by Passport if the user is authenticated
-    if (req.user) {
-        next(); // User is logged in, proceed to the route handler
-    } else {
-        res.status(401).json({ message: 'Unauthorized: You must be logged in.' });
+    // For demo purposes, we will bypass the authentication check.
+    // A mock user can be attached to the request object if needed by downstream middleware.
+    if (!req.user) {
+        // You can attach a mock user object if your controllers depend on it
+        // @ts-ignore
+        req.user = {
+            id: 'demo-user-id',
+            name: 'Demo User',
+            email: 'demo@example.com'
+        };
     }
+    next();
 };
