@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import User, { IUser } from '../models/User';
+import User from '../models/User';
+import type { IUser } from '../models/User';
 
 export const configurePassport = () => {
     passport.use(
@@ -8,7 +9,8 @@ export const configurePassport = () => {
             {
                 clientID: process.env.GOOGLE_CLIENT_ID as string,
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-                callbackURL: '/api/auth/google/callback',
+                // Construct the full, absolute callback URL using the new environment variable
+                callbackURL: `${process.env.BACKEND_URL}/api/auth/google/callback`,
             },
             async (accessToken, refreshToken, profile, done) => {
                 const newUser = {
@@ -21,33 +23,29 @@ export const configurePassport = () => {
                     let user = await User.findOne({ googleId: profile.id });
 
                     if (user) {
-                        // If user exists, pass the user object to the next step
                         done(null, user);
                     } else {
-                        // If user doesn't exist, create a new one
                         user = await User.create(newUser);
                         done(null, user);
                     }
                 } catch (err) {
                     console.error(err);
-                    done(err, undefined);
+                    done(err as Error, undefined);
                 }
             }
         )
     );
 
-    // Serializing user determines what data of the user object should be stored in the session.
     passport.serializeUser((user, done) => {
         done(null, (user as IUser).id);
     });
 
-    // Deserializing user will attach the user object to the request object (req.user).
     passport.deserializeUser(async (id, done) => {
         try {
             const user = await User.findById(id);
             done(null, user);
         } catch (err) {
-            done(err, null);
+            done(err as Error, null);
         }
     });
 };
