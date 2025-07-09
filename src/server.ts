@@ -32,7 +32,7 @@ const startServer = async () => {
     // Middleware
     app.use(helmet());
     app.use(cors({
-        origin: 'http://localhost:5173', // Allow requests from our future React app
+        origin: ['https://flowboard.me', 'https://www.flowboard.me'], // Allow requests from our future React app
         credentials: true // Allow cookies to be sent
     }));
     app.use(express.json());
